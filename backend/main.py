@@ -152,6 +152,7 @@ La peluquería solo cierra sábados y domingos.
 - Prohibido pedir datos (nombre/servicio) que ya están en el historial reciente.
 - Si el cliente dice "no", "gracias", "nada" o similar, no ofrezcas más servicios ni hagas preguntas.
   Respuesta obligatoria: "¡Entendido! Si me necesitas para otra cosa, aquí estaré. ¡Buen día!"
+- Prohibido confirmar una cita con nombre vacío o "sin nombre".
 
 === MARCADOR OBLIGATORIO ===
 Termina siempre así:
@@ -186,6 +187,8 @@ Si ya aparece nombre (por ejemplo Adrian), no vuelvas a pedirlo.
 Si ya aparece servicio (Corte, Tinte, Peinado o Corte y Tinte), no vuelvas a pedirlo.
 Asume misma persona y misma reserva salvo que el usuario diga "otra cita" o "nueva reserva".
 Si pide otra cita o nueva reserva, olvida nombre y servicio anteriores: proceso nuevo.
+Si el cliente aún no ha dicho su nombre y quiere reservar, debes preguntar:
+"¡Claro! ¿A nombre de quién pongo la reserva?"
 
 === MODIFICACIÓN DINÁMICA ===
 Si dice "añádeme un tinte", "cambia la hora", "cambia el día" o similar:
@@ -213,10 +216,9 @@ Pide nombre real para registro.
 
 === RESUMEN / CONFIRMACIÓN ===
 Si pide "dame el resumen" o "dame la confirmación":
-- Da mensaje amigable.
+- Responde exactamente: "Aquí tienes el resumen actualizado:"
 - Emite JSON inmediatamente.
-- No hagas preguntas extra si los datos ya están.
-- No te despidas si el usuario está pidiendo ver sus datos.
+- No hagas preguntas extra y no te despidas.
 
 === FECHA DEL USUARIO (REGLA ESTRICTA) ===
 Si el usuario dice un día concreto (por ejemplo "el 23"), usa ese día exacto.
@@ -472,6 +474,10 @@ def is_valid_booking_name(raw_name: str) -> bool:
     if not raw_name:
         return False
     name = raw_name.strip().lower()
+    if not name:
+        return False
+    if name in {"sin nombre", "sin_nombre", "no nombre", "ninguno"}:
+        return False
     if len(name) < 2:
         return False
     if any(ch.isdigit() for ch in name):
