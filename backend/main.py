@@ -690,6 +690,28 @@ def latest_pending_booking(db: Session, preferred_name: Optional[str] = None) ->
     }
 
 
+def hydrate_booking_for_update(raw_booking: Optional[dict], history: List[ChatMessage], db: Session) -> Optional[dict]:
+    """
+    Completa campos faltantes del JSON con la última reserva conocida para permitir updates
+    como "añádeme peinado" sin perder fecha/hora ni nombre.
+    """
+    if not raw_booking:
+        return None
+
+    booking = dict(raw_booking)
+    from_history = latest_booking_from_history(history)
+    from_db = latest_pending_booking(db, preferred_name=booking.get("nombre"))
+    base = from_history or from_db
+
+    if base:
+        booking.setdefault("nombre", base.get("nombre"))
+        booking.setdefault("servicio", base.get("servicio"))
+        booking.setdefault("fecha", base.get("fecha"))
+        booking.setdefault("hora", base.get("hora"))
+
+    return booking
+
+
 def extract_last_sentences(text: str, n: int = 3) -> str:
     """
     Extrae las últimas N frases significativas de un texto.
@@ -1119,7 +1141,7 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
         db_booking = latest_pending_booking(db)
         if db_booking:
             return ChatResponse(response=format_summary_with_json(db_booking), cita_creada=None)
-        return ChatResponse(response="Ahora mismo no veo una reserva activa. Si quieres, la montamos en un minuto.", cita_creada=None)
+        return ChatResponse(response="Ahora mismo no veo una reserva activa en el sistema.", cita_creada=None)
 
     # Regla dura: si el usuario corta la conversación, cerrar sin repreguntas.
     if is_closing_intent(user_message):
