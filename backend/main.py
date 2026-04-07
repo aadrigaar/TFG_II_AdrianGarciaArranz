@@ -704,7 +704,8 @@ def hydrate_booking_for_update(raw_booking: Optional[dict], history: List[ChatMe
     base = from_history or from_db
 
     if base:
-        booking.setdefault("nombre", base.get("nombre"))
+        if not booking.get("nombre") or not is_valid_booking_name(str(booking.get("nombre"))):
+            booking["nombre"] = base.get("nombre")
         booking.setdefault("servicio", base.get("servicio"))
         booking.setdefault("fecha", base.get("fecha"))
         booking.setdefault("hora", base.get("hora"))
@@ -1268,6 +1269,9 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
     add_service_intent = is_add_service_intent(user_message)
     booking_data = extract_booking_json(reply_clean)
     if booking_data:
+        if update_intent:
+            booking_data = hydrate_booking_for_update(booking_data, request.messages, db)
+
         requested_date = parse_requested_date(user_message, PROJECT_TODAY)
         if requested_date:
             booking_data["fecha"] = requested_date.isoformat()
