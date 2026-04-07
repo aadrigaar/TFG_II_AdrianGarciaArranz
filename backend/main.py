@@ -1105,7 +1105,6 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
         f"{_MESES[_now.month].capitalize()} de {_now.year}"
     )
     # Calcular días siguientes para el calendario
-    from datetime import timedelta
     _tomorrow = _now + timedelta(days=1)
     _day_after = _now + timedelta(days=2)
     tomorrow  = f"{_DIAS_COMPLETO[_tomorrow.weekday()]} {_tomorrow.day} de {_MESES[_tomorrow.month].capitalize()}"
