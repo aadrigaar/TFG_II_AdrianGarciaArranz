@@ -467,7 +467,11 @@ def is_today_query(user_text: str) -> bool:
 def is_summary_intent(user_text: str) -> bool:
     if not user_text:
         return False
-    return bool(re.search(r"(?:ens[eé]ñame|ensename|a ver|resumen|confirmaci[oó]n)", user_text, re.IGNORECASE))
+    return bool(re.search(
+        r"(?:dame la reserva|dame reserva|ens[eé]ñame|ensename|a ver|resumen|confirmaci[oó]n|p[áa]samela|pasamela)",
+        user_text,
+        re.IGNORECASE,
+    ))
 
 
 def is_valid_booking_name(raw_name: str) -> bool:
@@ -624,7 +628,9 @@ def is_update_intent(user_text: str) -> bool:
     if is_reset_intent(user_text):
         return False
     return bool(re.search(
-        r"\b(?:anade(?:me)?|añade(?:me)?|añademe|añádeme|agrega(?:me)?|suma(?:me)?"
+        r"\b(?:anade(?:me|melo)?|añade(?:me|melo)?|añademe|añádeme|añádemelo"
+        r"|ponme(?:\s+tambi[eé]n)?|tambien|tambi[eé]n"
+        r"|agrega(?:me)?|suma(?:me)?|incluye(?:me)?"
         r"|cambia(?:me)?|modifica(?:me|r)?|actualiza(?:me|r)?|mueve(?:me)?|reprograma(?:r)?)\b",
         user_text,
         re.IGNORECASE,
@@ -635,7 +641,9 @@ def is_add_service_intent(user_text: str) -> bool:
     if not user_text:
         return False
     return bool(re.search(
-        r"\b(?:anade(?:me)?|añade(?:me)?|añademe|añádeme|agrega(?:me)?|suma(?:me)?|incluye(?:me)?)\b",
+        r"\b(?:anade(?:me|melo)?|añade(?:me|melo)?|añademe|añádeme|añádemelo"
+        r"|ponme(?:\s+tambi[eé]n)?|tambien|tambi[eé]n"
+        r"|agrega(?:me)?|suma(?:me)?|incluye(?:me)?)\b",
         user_text,
         re.IGNORECASE,
     ))
@@ -662,7 +670,7 @@ def format_summary_with_json(booking: dict) -> str:
         "hora": booking["hora"],
     }
     return (
-        "Claro, aquí tienes tu reserva actualizada.\n"
+        "Aquí tienes el resumen actualizado:\n"
         f"```json\n{json.dumps(payload, ensure_ascii=False)}\n```"
     )
 
@@ -1263,6 +1271,6 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
             except ValueError:
                 reply_clean = "Lo siento, el fin de semana cerramos. ¿Te viene mejor el viernes o el lunes?"
         elif validation_error == "ERR_NAME_INVALID":
-            reply_clean = "¿A nombre de quién pongo la reserva? Necesito un nombre para el registro."
+            reply_clean = "¡Claro! ¿A nombre de quién pongo la reserva?"
 
     return ChatResponse(response=reply_clean, cita_creada=cita_out)
