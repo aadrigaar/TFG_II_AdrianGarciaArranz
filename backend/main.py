@@ -40,7 +40,8 @@ INFO_REPLY = (
     "Corte y Tinte 60€, Corte y Tinte y Peinado 75€."
 )
 INVALID_NAME_PARTICLES = {
-    "so", "si", "ok", "yo", "asdf", "asd", "q", "w", "e", "r", "x", "z", "na", "nop"
+    "so", "si", "ok", "yo", "asdf", "asd", "q", "w", "e", "r", "x", "z", "na", "nop",
+    "sin", "nombre", "desconocido", "anonimo", "anónimo"
 }
 SPANISH_MONTHS = {
     "enero": 1,
